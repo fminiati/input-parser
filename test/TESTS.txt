@@ -1,0 +1,37 @@
+Test Suite Summary
+==================
+
+All tests are standalone C++ programs. Compile and run from the repo root:
+
+  clang++ -std=c++17 -I src <test>.cpp -o <test> && ./<test>
+
+Return code: 0 = pass, non-zero = fail.
+
+Error Handling
+--------------
+test_bad_path         Constructor throws FileParserError on nonexistent file.
+test_missing_key      get_item throws FileParserError on missing key.
+test_type_mismatch    get_item throws ios_base::failure on type mismatch (e.g. "hello" into int).
+
+Basic Parsing
+-------------
+test_single_key       Single key=value round-trips correctly.
+test_assertions       Full input: get_item with int and float, get_items with vector.
+test_whitespace       Leading/trailing spaces around keys and values are stripped.
+
+Container Types
+---------------
+test_list             get_items with std::list.
+test_array            get_items with std::array.
+
+Continuation (\)
+-----------------
+test_continuation     Backslash at end of line joins values across lines.
+test_continuation_comment  Same pattern with different types.
+test_cont_before_comment   Backslash before # comment, value continues on next line.
+test_cont_multi       Multiple chained backslashes across 3+ lines.
+test_cont_value_on_next    Value starts entirely on next line (key = \).
+
+Edge Cases
+----------
+test_empty_input      File with only comments parses to empty map.
