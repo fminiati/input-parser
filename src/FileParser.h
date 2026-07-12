@@ -24,6 +24,7 @@
 
 #include <cassert>
 #include <string>
+#include <stdexcept>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -31,6 +32,12 @@
 
 namespace fm
 {
+    class FileParserError : public std::runtime_error
+    {
+    public:
+        using std::runtime_error::runtime_error;
+    };
+
     class FileParser
     {
     public:
@@ -83,11 +90,8 @@ namespace fm
                     {
                         if (append_entry_to_prev_key)
                         {
-                            std::cerr << "\nexpecting input continuation from previous line..."
-                                         " perhaps forgot open \\ in input file!\n\n";
-                            // close file
                             file.close();
-                            std::abort();
+                            throw FileParserError("expecting input continuation from previous line");
                         }
                     }
                 }
@@ -96,8 +100,7 @@ namespace fm
             }
             else
             {
-                std::cerr << "FileParser::define: Error while opening file!\n";
-                std::abort();
+                throw FileParserError("cannot open file: " + a_file_name);
             }
         }
 
@@ -105,24 +108,15 @@ namespace fm
         template <class T>
         void get_item(T &a_val, const std::string a_name)
         {
-            // search object a_name
             if (const auto it = m_entries.find(a_name); it != m_entries.end())
             {
-                try
-                {
-                    std::istringstream line(it->second);
-                    line >> a_val;
-                }
-                catch (std::ios_base::failure &)
-                {
-                    std::cout << "FileParser::get_item: error: entry was : "
-                              << it->second << "\n";
-                }
+                std::istringstream line(it->second);
+                line.exceptions(std::ios_base::failbit);
+                line >> a_val;
             }
             else
             {
-                std::cerr << "FileParser::get_item: item " << a_name << " not found!\n";
-                std::abort();
+                throw FileParserError("item not found: " + a_name);
             }
         }
 
@@ -130,27 +124,18 @@ namespace fm
         template <class T>
         void get_items(T &a_c, const std::string a_name)
         {
-            assert(a_c.size() > 0); //"FileParser::get_items: size of "+a_name+" must be >0");
+            assert(a_c.size() > 0);
 
-            // search object a_name
-            if (const auto it = m_entries.find(a_name.c_str()); it != m_entries.end())
+            if (const auto it = m_entries.find(a_name); it != m_entries.end())
             {
-                try
-                {
-                    std::istringstream line(it->second);
-                    for (auto &c : a_c)
-                        line >> c;
-                }
-                catch (std::ios_base::failure &)
-                {
-                    std::cout << "FileParser::get_item: error: entry was : "
-                              << it->second << "\n";
-                }
+                std::istringstream line(it->second);
+                line.exceptions(std::ios_base::failbit);
+                for (auto &c : a_c)
+                    line >> c;
             }
             else
             {
-                std::cerr << "FileParser::get_item: item " << a_name << " not found!\n";
-                std::abort();
+                throw FileParserError("item not found: " + a_name);
             }
         }
 
