@@ -19,7 +19,7 @@ for f in "$test_dir"/test_*.cpp; do
         echo "FAIL: $name (exit $?)"
         fail=$((fail + 1))
     fi
-    rm -f "$test_dir/$name" "$test_dir/${name}_input"
+    rm -f "$test_dir/$name" "$test_dir/${name}_input" "$test_dir/empty_input_data"
 done
 
 echo ""

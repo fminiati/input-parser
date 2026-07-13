@@ -6,7 +6,7 @@
 
 int main()
 {
-    const std::string path = "test/test_empty_input";
+    const std::string path = "test/empty_input_data";
     {
         std::ofstream out(path);
         out << "# just a comment\n";
@@ -20,12 +20,11 @@ int main()
     parser.flush();
     std::cout.rdbuf(old);
 
-    if (buf.str().empty())
-    {
-        std::remove(path.c_str());
-        return 0;
-    }
-
     std::remove(path.c_str());
+
+    if (buf.str().empty())
+        return 0;
+
+    std::cerr << "unexpected output: [" << buf.str() << "]" << std::endl;
     return 1;
 }
