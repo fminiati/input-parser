@@ -9,15 +9,15 @@ for f in "$test_dir"/test_*.cpp; do
     name=$(basename "$f" .cpp)
     if ! clang++ -std=c++17 -I src "$f" -o "$test_dir/$name" 2>&1; then
         echo "COMPILE FAIL: $name"
-        ((fail++))
+        fail=$((fail + 1))
         continue
     fi
     if "$test_dir/$name" 2>&1; then
         echo "PASS: $name"
-        ((pass++))
+        pass=$((pass + 1))
     else
         echo "FAIL: $name (exit $?)"
-        ((fail++))
+        fail=$((fail + 1))
     fi
     rm -f "$test_dir/$name" "$test_dir/${name}_input"
 done
