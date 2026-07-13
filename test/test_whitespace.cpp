@@ -5,7 +5,7 @@
 
 int main()
 {
-    const std::string path = "test/test_whitespace_input";
+    const std::string path = "/tmp/test_whitespace.dat";
     {
         std::ofstream out(path);
         out << "  key1  =  value1  \n";

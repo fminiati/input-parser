@@ -6,7 +6,7 @@
 
 int main()
 {
-    const std::string path = "test/test_list_input";
+    const std::string path = "/tmp/test_list.dat";
     {
         std::ofstream out(path);
         out << "lsize = 4\n";

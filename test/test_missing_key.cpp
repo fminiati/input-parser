@@ -4,7 +4,7 @@
 
 int main()
 {
-    const std::string path = "test/test_missing_key_input";
+    const std::string path = "/tmp/test_missing_key.dat";
     {
         std::ofstream out(path);
         out << "exists = 42\n";

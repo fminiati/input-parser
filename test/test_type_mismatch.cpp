@@ -5,7 +5,7 @@
 
 int main()
 {
-    const std::string path = "test/test_type_mismatch_input";
+    const std::string path = "/tmp/test_type_mismatch.dat";
     {
         std::ofstream out(path);
         out << "name = hello\n";

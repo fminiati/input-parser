@@ -5,7 +5,7 @@
 
 int main()
 {
-    const std::string path = "test/test_single_key_input";
+    const std::string path = "/tmp/test_single_key.dat";
     {
         std::ofstream out(path);
         out << "answer = 42\n";

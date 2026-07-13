@@ -6,7 +6,7 @@ int main()
 {
     try
     {
-        fm::FileParser parser("test/nonexistent_file.txt");
+        fm::FileParser parser("/tmp/nonexistent.txt");
     }
     catch (const fm::FileParserError &)
     {

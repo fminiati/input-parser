@@ -6,7 +6,7 @@
 
 int main()
 {
-    const std::string path = "test/test_array_input";
+    const std::string path = "/tmp/test_array.dat";
     {
         std::ofstream out(path);
         out << "data = 5 6 7 8 9\n";
