@@ -11,7 +11,7 @@ Error Handling
 --------------
 test_bad_path         Constructor throws FileParserError on nonexistent file.
 test_missing_key      get_item throws FileParserError on missing key.
-test_type_mismatch    get_item throws ios_base::failure on type mismatch (e.g. "hello" into int).
+test_type_mismatch    get_item throws FileParserError on type mismatch (e.g. "hello" into int).
 
 Basic Parsing
 -------------
@@ -35,3 +35,7 @@ test_cont_value_on_next    Value starts entirely on next line (key = \).
 Edge Cases
 ----------
 test_empty_input      File with only comments parses to empty map.
+test_empty_key        Equals at position 0 throws FileParserError.
+test_no_equals        Line without = throws FileParserError.
+test_cont_comment_only   Continuation line with only spaces/backslashes before #.
+test_backslash_only_cont Backslash-only continuation line before #.
