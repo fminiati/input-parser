@@ -17,7 +17,7 @@ int main()
         int val{};
         parser.get_item(val, "name");
     }
-    catch (const std::ios_base::failure &)
+    catch (const fm::FileParserError &)
     {
         std::remove(path.c_str());
         return 0;
