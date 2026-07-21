@@ -23,7 +23,7 @@ test/run_tests.sh
 
 - `key = value` lines; `#` starts a comment; `\` before/after a comment means "continues on next line".
 - `get_item(name, T&)` reads a single value; `get_items(name, T&)` fills a container of `T` (container must be pre-sized).
-- Parser throws `FileParserError` on missing keys, bad file paths, or malformed input. Type mismatches throw `std::ios_base::failure`.
+- Parser throws `FileParserError` on missing keys, bad file paths, malformed input, or type mismatches.
 
 ## Conventions
 
