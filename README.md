@@ -1,15 +1,119 @@
-# util
+# FileParser
 
-FileParser.h:
+A single-header C++ library for parsing `key=value` input files into a `std::unordered_map<string,string>`.
 
-FileParser.h parses a file typically to read in input parameters data values in the setup of a code's execution.
-The input data, expected to be written in the format key=value, is mapped to a C++ std::unordered_map<string,string>.
-Content behind a hash char '#' is ignored and a backslash '\' is interpreted as "continue to the next line".
-To retrieve the value associated to a key a user calls a template function with two parameters, a key of string type
-and an object to be assigned the key's associated value, whose (user defined) type defines the template type. Such 
-object can represent a single item or a container (e.g., a vector). 
-When the value of a key is requested by the user, the unordered_map is queried for the key, the mapped string value 
-retrieved, and its content stringstream-assigned to the object passed as the second function's parameter.
-If the latter is a container the parser will try to assign one value to each of the containers elements.
-This means that the container's size must be queried first, the container accordingly resised, before its content is
-queried.
+## Features
+
+- Single header, no build system required
+- `key = value` syntax with `#` comments and `\` line continuation
+- Template-based retrieval into scalars or pre-sized containers (`vector`, `list`, `array`, etc.)
+- Throws `FileParserError` on missing keys, bad file paths, or malformed input
+- Type mismatches throw `std::ios_base::failure`
+
+## Usage
+
+### Input file (`config.txt`)
+
+```
+# simulation parameters
+steps = 100
+dt = 0.001
+
+# particle positions
+nparticles = 3
+positions = 0.0 1.5 2.3 \   # continues on next line
+            3.1 4.0 5.7
+```
+
+### C++ code
+
+```cpp
+#include "FileParser.h"
+#include <iostream>
+#include <string>
+#include <vector>
+
+int main()
+{
+    fm::FileParser parser("config.txt");
+
+    // Read a single value
+    int steps{};
+    parser.get_item(steps, "steps");
+
+    double dt{};
+    parser.get_item(dt, "dt");
+
+    // Read into a pre-sized container
+    int n{};
+    parser.get_item(n, "nparticles");
+
+    std::vector<double> positions(n);
+    parser.get_items(positions, "positions");
+
+    std::cout << "steps=" << steps << ", dt=" << dt << "\n";
+    for (int i = 0; i < n; ++i)
+        std::cout << "  particle " << i << ": " << positions[i] << "\n";
+}
+```
+
+## Input file format
+
+| Feature | Syntax |
+|---|---|
+| Comment | `# text` |
+| Key-value pair | `key = value` (spaces around `=` optional) |
+| Line continuation | `\` before or after a comment |
+
+Continuation appends the next line to the current value:
+
+```
+vector = 1.0 2.0 3.0 \ # continues below
+         4.0 5.0
+```
+
+is parsed as `vector` = `"1.0 2.0 3.0 4.0 5.0"`.
+
+## API
+
+```cpp
+namespace fm {
+
+class FileParser {
+public:
+    // Parse the given input file
+    FileParser(const std::string file_name);
+
+    // Read a single value into a scalar
+    template <class T>
+    void get_item(T &val, const std::string name);
+
+    // Fill a pre-sized container with values
+    template <class T>
+    void get_items(T &container, const std::string name);
+
+    // Print all parsed key-value pairs to stdout
+    void flush() const;
+};
+
+} // namespace fm
+```
+
+## Build & run
+
+No build system. Compile manually:
+
+```bash
+clang++ -std=c++17 -I src example/parser.cpp -o parser_example
+./parser_example -f example/parser_input
+```
+
+Or run the test suite:
+
+```bash
+test/run_tests.sh
+```
+
+## License
+
+MIT -- see [LICENSE](LICENSE).
