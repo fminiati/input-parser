@@ -9,8 +9,8 @@ Header-only C++ library (`fm::FileParser`) that parses `key=value` input files i
 No build system. Compile the test manually:
 
 ```
-clang++ -std=c++17 -I src test/parser.cpp -o parser_test
-./parser_test -f test/parser_input
+clang++ -std=c++17 -I src example/parser.cpp -o parser_example
+./parser_example -f example/parser_input
 ```
 
 Run the test suite:
@@ -27,5 +27,5 @@ test/run_tests.sh
 
 ## Conventions
 
-- No build config, CI, linter, formatter, or test framework. Changes are validated by compiling and running `test/parser.cpp`.
+- No build config, CI, linter, formatter, or test framework. Changes are validated by compiling and running `example/parser.cpp`.
 - C++17 only. Target platform config assumes clang++ on macOS (see `.vscode/c_cpp_properties.json`).
