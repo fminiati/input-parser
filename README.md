@@ -7,8 +7,7 @@ A single-header C++ library for parsing `key=value` input files into a `std::uno
 - Single header, no build system required
 - `key = value` syntax with `#` comments and `\` line continuation
 - Template-based retrieval into scalars or pre-sized containers (`vector`, `list`, `array`, etc.)
-- Throws `FileParserError` on missing keys, bad file paths, or malformed input
-- Type mismatches throw `std::ios_base::failure`
+- Throws `FileParserError` on missing keys, bad file paths, malformed input, or type mismatches
 
 ## Usage
 
@@ -82,15 +81,15 @@ namespace fm {
 class FileParser {
 public:
     // Parse the given input file
-    FileParser(const std::string file_name);
+    FileParser(const std::string& file_name);
 
     // Read a single value into a scalar
     template <class T>
-    void get_item(T &val, const std::string name);
+    void get_item(T &val, const std::string& name);
 
     // Fill a pre-sized container with values
     template <class T>
-    void get_items(T &container, const std::string name);
+    void get_items(T &container, const std::string& name);
 
     // Print all parsed key-value pairs to stdout
     void flush() const;
