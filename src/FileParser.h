@@ -19,15 +19,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef FILEPARSER_H
-#define FILEPARSER_H
+#ifndef FILE_PARSER_H
+#define FILE_PARSER_H
 
 #include <string>
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <array>
 #include <unordered_map>
+#include <ranges>
 
 namespace fm
 {
@@ -58,7 +60,6 @@ namespace fm
                     const auto end = line.find_first_of('#');
                     if (end > beg)
                     {
-                        // trim trailing spaces and backslashes (backslash indicates continuation)
                         const auto limit = (end != std::string::npos) ? end : line.size();
                         auto content_end = limit;
                         while (content_end > beg && (line[content_end-1] == ' ' || line[content_end-1] == '\\'))
@@ -75,7 +76,6 @@ namespace fm
                         else
                             throw FileParserError("malformed input line");
 
-                        // is there a backslash before commented out text ?
                         append_entry_to_prev_key = false;
                         auto scan = content_end;
                         while (scan < limit && line[scan] == ' ')
@@ -100,19 +100,21 @@ namespace fm
 
         // get item value of entry a_name
         template <class T>
-        void get_item(T &a_val, const std::string& a_name)
+        T get_item(const std::string& a_name) const
         {
             if (const auto it = m_entries.find(a_name); it != m_entries.end())
             {
+                T value;
                 std::istringstream line(it->second);
                 line.exceptions(std::ios_base::failbit);
                 try {
-                    line >> a_val;
+                    line >> value;
                 } catch (const std::ios_base::failure&) {
                     throw FileParserError("bad value for item: " + a_name);
                 }
                 if (!line.eof())
                     throw FileParserError("trailing data for item: " + a_name);
+                return value;
             }
             else
             {
@@ -120,25 +122,63 @@ namespace fm
             }
         }
 
-        // fill a_c container with (a_c.size) items from entry a_name
-        template <class T>
-        void get_items(T &a_c, const std::string& a_name)
+        // get container of items from entry a_name
+        // count=0 means auto-size (read all); count>0 means strict (throw if not enough)
+        template <std::ranges::range T>
+        T get_items(const std::string& a_name, std::size_t count = 0) const
         {
-            if (a_c.empty())
-                throw FileParserError("container is empty: " + a_name);
+            using tval_type = std::ranges::range_value_t<T>;
 
             if (const auto it = m_entries.find(a_name); it != m_entries.end())
             {
+                T items{};
+                std::istringstream line(it->second);
+                std::size_t i = 0;
+                tval_type x;
+                while (line >> x) {
+                    if constexpr (requires(T t, tval_type v) { t.emplace_back(v); })
+                        items.emplace_back(x);
+                    else if constexpr (requires(T t, tval_type v) { t.emplace(v); })
+                        items.emplace(x);
+                    else
+                        items[i] = x;
+                    if (count > 0 && ++i >= count) break;
+                }
+                if (line.fail() && !line.eof())
+                    throw FileParserError("bad value for item: " + a_name);
+                if (count > 0) {
+                    if (i < count)
+                        throw FileParserError("not enough values for item: " + a_name);
+                    tval_type probe;
+                    if (line >> probe)
+                        throw FileParserError("trailing data for item: " + a_name);
+                }
+                return items;
+            }
+            else
+            {
+                throw FileParserError("item not found: " + a_name);
+            }
+        }
+
+        // get fixed-size array from entry a_name
+        template <typename T, std::size_t N>
+        std::array<T, N> get_array(const std::string& a_name) const
+        {
+            if (const auto it = m_entries.find(a_name); it != m_entries.end())
+            {
+                std::array<T, N> items{};
                 std::istringstream line(it->second);
                 line.exceptions(std::ios_base::failbit);
                 try {
-                    for (auto &c : a_c)
+                    for (auto& c : items)
                         line >> c;
                 } catch (const std::ios_base::failure&) {
                     throw FileParserError("bad value for item: " + a_name);
                 }
                 if (!line.eof())
                     throw FileParserError("trailing data for item: " + a_name);
+                return items;
             }
             else
             {
@@ -149,7 +189,7 @@ namespace fm
         // flush entries
         void flush() const
         {
-            for (const auto& [key, entry] : m_entries)
+            for (auto [key, entry] : m_entries)
             {
                 std::cout << "\"" << key << "\" -- \"" << entry << "\"" << '\n';
             }
