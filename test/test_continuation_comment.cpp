@@ -15,8 +15,7 @@ int main()
 
     fm::FileParser parser(path);
 
-    std::vector<int> v(4);
-    parser.get_items(v, "data");
+    auto v = parser.get_items<std::vector<int>>("data");
 
     if (v[0] != 10 || v[1] != 20 || v[2] != 30 || v[3] != 40)
         return 1;

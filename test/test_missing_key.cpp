@@ -13,8 +13,7 @@ int main()
     try
     {
         fm::FileParser parser(path);
-        int val{};
-        parser.get_item(val, "does_not_exist");
+        parser.get_item<int>("does_not_exist");
     }
     catch (const fm::FileParserError &)
     {

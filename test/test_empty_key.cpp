@@ -14,8 +14,7 @@ int main()
     try
     {
         fm::FileParser parser(path);
-        int val{};
-        parser.get_item(val, "");
+        parser.get_item<int>("");
     }
     catch (const fm::FileParserError &)
     {

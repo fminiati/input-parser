@@ -14,8 +14,7 @@ int main()
 
     fm::FileParser parser(path);
 
-    std::array<int, 5> a{};
-    parser.get_items(a, "data");
+    auto a = parser.get_array<int, 5>("data");
 
     if (a[0] != 5) return 1;
     if (a[1] != 6) return 2;

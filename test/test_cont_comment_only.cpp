@@ -16,8 +16,7 @@ int main()
 
     fm::FileParser parser(path);
 
-    std::vector<int> v(4);
-    parser.get_items(v, "data");
+    auto v = parser.get_items<std::vector<int>>("data");
 
     if (v[0] != 1 || v[1] != 2 || v[2] != 3 || v[3] != 4)
     {

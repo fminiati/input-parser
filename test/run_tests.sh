@@ -9,7 +9,7 @@ pass=0 fail=0
 
 for f in "$test_dir"/test_*.cpp; do
     name=$(basename "$f" .cpp)
-    if ! clang++ -std=c++17 -I src "$f" -o "$build_dir/$name" 2>&1; then
+    if ! clang++ -std=c++20 -I src "$f" -o "$build_dir/$name" 2>&1; then
         echo "COMPILE FAIL: $name"
         fail=$((fail + 1))
         continue

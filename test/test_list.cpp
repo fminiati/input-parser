@@ -9,17 +9,12 @@ int main()
     const std::string path = "/tmp/test_list.dat";
     {
         std::ofstream out(path);
-        out << "lsize = 4\n";
         out << "data = 10 20 30 40\n";
     }
 
     fm::FileParser parser(path);
 
-    int sz{};
-    parser.get_item(sz, "lsize");
-
-    std::list<int> l(sz);
-    parser.get_items(l, "data");
+    auto l = parser.get_items<std::list<int>>("data");
 
     auto it = l.begin();
     if (*it++ != 10) return 1;

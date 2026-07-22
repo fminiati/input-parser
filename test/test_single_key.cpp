@@ -13,8 +13,7 @@ int main()
 
     fm::FileParser parser(path);
 
-    int val{};
-    parser.get_item(val, "answer");
+    auto val = parser.get_item<int>("answer");
 
     if (val != 42)
         return 1;

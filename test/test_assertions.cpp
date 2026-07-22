@@ -16,18 +16,15 @@ int main()
 
     fm::FileParser parser(path);
 
-    int vsize{};
-    parser.get_item(vsize, "vsize");
+    auto vsize = parser.get_item<int>("vsize");
     if (vsize != 3)
         return 1;
 
-    std::vector<double> v(vsize);
-    parser.get_items(v, "vector");
+    auto v = parser.get_items<std::vector<double>>("vector");
     if (v[0] != 1.0 || v[1] != 2.0 || v[2] != 3.0)
         return 2;
 
-    float x{};
-    parser.get_item(x, "flt_x");
+    auto x = parser.get_item<float>("flt_x");
     if (x != 7.5f)
         return 3;
 

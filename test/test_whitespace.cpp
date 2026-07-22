@@ -15,10 +15,9 @@ int main()
 
     fm::FileParser parser(path);
 
-    std::string v1, v2, v3;
-    parser.get_item(v1, "key1");
-    parser.get_item(v2, "key2");
-    parser.get_item(v3, "key3");
+    auto v1 = parser.get_item<std::string>("key1");
+    auto v2 = parser.get_item<std::string>("key2");
+    auto v3 = parser.get_item<std::string>("key3");
 
     if (v1 != "value1" || v2 != "value2" || v3 != "value3")
         return 1;

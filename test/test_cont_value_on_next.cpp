@@ -15,8 +15,7 @@ int main()
 
     fm::FileParser parser(path);
 
-    std::vector<double> v(1);
-    parser.get_items(v, "data");
+    auto v = parser.get_items<std::vector<double>>("data");
 
     if (v[0] != 3.0)
         return 1;
