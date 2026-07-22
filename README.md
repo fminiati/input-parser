@@ -45,6 +45,9 @@ int main()
     // Read into an auto-sized container
     auto positions = parser.get_items<std::vector<double>>("positions");
 
+    // Read into a container with explicit count (strict: throws if not enough values)
+    auto first_three = parser.get_items<std::vector<double>>("positions", 3);
+
     std::cout << "steps=" << steps << ", dt=" << dt << "\n";
     for (int i = 0; i < positions.size(); ++i)
         std::cout << "  particle " << i << ": " << positions[i] << "\n";
