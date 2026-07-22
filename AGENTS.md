@@ -9,7 +9,7 @@ Header-only C++ library (`fm::FileParser`) that parses `key=value` input files i
 No build system. Compile the test manually:
 
 ```
-clang++ -std=c++17 -I src example/parser.cpp -o parser_example
+clang++ -std=c++20 -I src example/parser.cpp -o parser_example
 ./parser_example -f example/parser_input
 ```
 
@@ -22,10 +22,11 @@ test/run_tests.sh
 ## Input file format
 
 - `key = value` lines; `#` starts a comment; `\` before/after a comment means "continues on next line".
-- `get_item(name, T&)` reads a single value; `get_items(name, T&)` fills a container of `T` (container must be pre-sized).
+- `get_item<T>(name)` returns a single value; `get_items<Container>(name, count)` returns a container (count=0 auto-sizes, count>0 strict); `get_array<T,N>(name)` returns a fixed-size array.
+- `get_items` supports any `std::ranges::range` container: `vector`, `deque`, `list`, `set`, `unordered_set`, etc.
 - Parser throws `FileParserError` on missing keys, bad file paths, malformed input, or type mismatches.
 
 ## Conventions
 
 - No build config, CI, linter, formatter, or test framework. Changes are validated by compiling and running `example/parser.cpp`.
-- C++17 only. Target platform config assumes clang++ on macOS (see `.vscode/c_cpp_properties.json`).
+- C++20 only. Target platform config assumes clang++ on macOS (see `.vscode/c_cpp_properties.json`).
