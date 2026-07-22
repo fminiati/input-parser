@@ -6,7 +6,9 @@ A single-header C++ library for parsing `key=value` input files into a `std::uno
 
 - Single header, no build system required
 - `key = value` syntax with `#` comments and `\` line continuation
-- Template-based retrieval into scalars or pre-sized containers (`vector`, `list`, `array`, etc.)
+- Template-based retrieval into scalars, dynamic containers, or fixed-size arrays
+- `get_item<T>(name)` returns a single value; `get_items<Container>(name)` returns an auto-sized container; `get_array<T,N>(name)` returns a fixed-size array
+- `get_items` supports any `std::ranges::range` container: `vector`, `deque`, `list`, `set`, `unordered_set`, etc.
 - Throws `FileParserError` on missing keys, bad file paths, malformed input, or type mismatches
 
 ## Usage
@@ -37,21 +39,14 @@ int main()
     fm::FileParser parser("config.txt");
 
     // Read a single value
-    int steps{};
-    parser.get_item(steps, "steps");
+    auto steps = parser.get_item<int>("steps");
+    auto dt = parser.get_item<double>("dt");
 
-    double dt{};
-    parser.get_item(dt, "dt");
-
-    // Read into a pre-sized container
-    int n{};
-    parser.get_item(n, "nparticles");
-
-    std::vector<double> positions(n);
-    parser.get_items(positions, "positions");
+    // Read into an auto-sized container
+    auto positions = parser.get_items<std::vector<double>>("positions");
 
     std::cout << "steps=" << steps << ", dt=" << dt << "\n";
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < positions.size(); ++i)
         std::cout << "  particle " << i << ": " << positions[i] << "\n";
 }
 ```
@@ -83,13 +78,18 @@ public:
     // Parse the given input file
     FileParser(const std::string& file_name);
 
-    // Read a single value into a scalar
+    // Read a single value (type must be specified explicitly)
     template <class T>
-    void get_item(T &val, const std::string& name);
+    T get_item(const std::string& name) const;
 
-    // Fill a pre-sized container with values
-    template <class T>
-    void get_items(T &container, const std::string& name);
+    // Read into a container (count=0 auto-sizes, count>0 is strict)
+    // Supports: vector, deque, list, set, unordered_set, etc.
+    template <std::ranges::range T>
+    T get_items(const std::string& name, std::size_t count = 0) const;
+
+    // Read into a fixed-size array (size is the template parameter)
+    template <typename T, std::size_t N>
+    std::array<T, N> get_array(const std::string& name) const;
 
     // Print all parsed key-value pairs to stdout
     void flush() const;
@@ -103,7 +103,7 @@ public:
 No build system. Compile manually:
 
 ```bash
-clang++ -std=c++17 -I src example/parser.cpp -o parser_example
+clang++ -std=c++20 -I src example/parser.cpp -o parser_example
 ./parser_example -f example/parser_input
 ```
 
